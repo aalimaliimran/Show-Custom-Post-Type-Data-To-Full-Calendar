@@ -1,6 +1,4 @@
-# Show-Custom-Post-Type-Data-To-Full-Calendar
-
-Certainly! Here's a draft for your Medium article:
+Show-Custom-Post-Type-Data-To-Full-Calendar
 
 ---
 
@@ -14,7 +12,10 @@ The need for a personalized event showcase prompted the creation of two distinct
 To seamlessly blend these events into a unified calendar experience, a robust query was crafted. This WordPress query not only considered both custom post types but also prioritized events based on their designated event dates.
 
 ```php
-	<?php
+<?php
+
+
+
 // Query events
 $args = array(
     'post_type' => array('local_events', 'event_webinars'),
@@ -30,32 +31,49 @@ $events_query = new WP_Query($args);
 // Prepare events data for FullCalendar
 $events = array();
 while ($events_query->have_posts()) : $events_query->the_post();
-    $event_date = get_field('event_date'); // Replace with your actual custom field key
-	$formatted_date = date('Y-m-d', strtotime($event_date)); // Format the date to ISO8601
+    $event_start_date = get_field('event_date'); // Replace with your actual custom field key
+    $event_end_date = get_field('event_end_date');
+    
+
+
+	$event_start_date_formatted = date('Y-m-d', strtotime($event_start_date));
+    $event_end_date_formatted = date('Y-m-d', strtotime($event_end_date));
 	
 /* 	$formatted_date = DateTime::createFromFormat('d/m/Y', $event_date); */
-    if ($formatted_date) {
+
   /*       $formatted_date = $formatted_date->format('Y-m-d'); */
 	
         $events[] = array(
             'title' => get_the_title(),
-            'start' => $formatted_date,
+            'start' => $event_start_date_formatted,
+            'end' => $event_end_date_formatted,
 			'url' => get_permalink(), // Add the event permalink
         );
-    }
+    
 endwhile;
 
 wp_reset_postdata();
 
 
 ?>
-
-<div id='calendar'></div>
+<style>
+	.events_calendar_view_wrapper{
+		margin-bottom:50px;
+	}
+	.fc-event{
+		width:100%;
+	}
+	.events_calendar_view_wrapper a{
+		font-size:16px !important;
+	}
+</style>
+<div id='calendar' class="events_calendar_view_wrapper"></div>
 
 <script>
         document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
+
           initialView: 'dayGridMonth',
 		  events: <?php echo json_encode($events); ?>,
 		  eventClick: function (info) {
@@ -63,7 +81,22 @@ wp_reset_postdata();
                     window.open(info.event.url, '_self');
                     return false; // Prevents the default action
                 }
-            }
+            },
+			eventContent: function (arg) {
+                return {
+                    html: '<div class="event-title">' + arg.event.title + '</div>',
+                    display: 'block',
+                };
+            },
+			eventDidMount: function (arg) {
+                // Adjust the event element's styles after it has been mounted
+                var eventTitleElement = arg.el.querySelector('.event-title');
+                if (eventTitleElement) {
+                    eventTitleElement.style.whiteSpace = 'normal'; // Allow text to wrap
+                    eventTitleElement.style.overflow = 'hidden'; // Hide overflow
+                    eventTitleElement.style.textOverflow = 'ellipsis'; // Show ellipsis for overflow
+                }
+            },
         });
         calendar.render();
       });
