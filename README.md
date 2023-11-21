@@ -4,8 +4,6 @@ Certainly! Here's a draft for your Medium article:
 
 ---
 
-**Title:** Unleashing the Power of Custom Post Types in WordPress: A Calendar Integration Journey
-
 **Introduction:**
 In the vast landscape of WordPress customization, harnessing the power of custom post types has proven to be a game-changer. Recently, I embarked on a journey to integrate two custom post types, `local_events` and `event_webinars`, into a dynamic and interactive calendar on my WordPress site.
 
