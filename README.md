@@ -101,6 +101,7 @@ wp_reset_postdata();
         calendar.render();
       });
 </script>
+
 ```
 
 **Formatting the Date:**
